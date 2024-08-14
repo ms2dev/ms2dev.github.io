@@ -21,21 +21,6 @@
             position: relative;
             overflow: hidden;
         }
-        header::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.1) 25%, transparent 25%), 
-                              radial-gradient(circle, transparent 20%, rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0.1) 30%, transparent 30%), 
-                              radial-gradient(circle, rgba(255, 255, 255, 0.05) 5%, transparent 5%);
-            background-size: 50px 50px;
-            background-position: 0 0, 25px 25px, 50px 50px;
-            opacity: 0.3;
-            pointer-events: none;
-        }
         header h1 {
             font-size: 3rem;
             margin: 0;
@@ -69,6 +54,8 @@
             background-color: #2e2e2e;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: left;
+            position: relative;
         }
         .download-card h2 {
             margin-top: 0;
@@ -77,6 +64,13 @@
         .download-card p {
             margin-bottom: 10px;
             font-size: 1.1rem;
+        }
+        .download-card .downloads {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1rem;
+            color: #ffcc00;
         }
         footer {
             text-align: center;
@@ -100,24 +94,80 @@
         <div class="download-card">
             <h2>FL Studio Producer Edition v21.1.1 [build 3750] 全插件版</h2>
             <p>适用于 Windows</p>
-            <a href="magnet:?xt=urn:btih:B3B69DD393190401EE77EB68C1644FB97B11A7D6" class="download-link">下载</a>
+            <a href="magnet:?xt=urn:btih:B3B69DD393190401EE77EB68C1644FB97B11A7D6" class="download-link" data-id="fl-studio-producer">下载</a>
+            <span class="downloads">下载量: <span id="fl-studio-producer-count">0</span> 次</span>
         </div>
         
         <div class="download-card">
             <h2>FL Studio v20.8.3 [build 1574] 制作人版</h2>
             <p>适用于 Mac</p>
-            <a href="magnet:?xt=urn:btih:9DFBC445849C11D8C1761615286DE510EE289F48" class="download-link">下载</a>
+            <a href="magnet:?xt=urn:btih:9DFBC445849C11D8C1761615286DE510EE289F48" class="download-link" data-id="fl-studio-mac">下载</a>
+            <span class="downloads">下载量: <span id="fl-studio-mac-count">0</span> 次</span>
         </div>
         
         <div class="download-card">
             <h2>FL Studio v20.8.3 [Build 2304] Signature Bundle 进阶版</h2>
             <p>适用于 Windows 和 Mac</p>
-            <a href="magnet:?xt=urn:btih:7C922F89C84DF9D65177C91D43F201BF6383B02F" class="download-link">下载</a>
+            <a href="magnet:?xt=urn:btih:7C922F89C84DF9D65177C91D43F201BF6383B02F" class="download-link" data-id="fl-studio-signature">下载</a>
+            <span class="downloads">下载量: <span id="fl-studio-signature-count">0</span> 次</span>
         </div>
     </div>
     
     <footer>
         <p>本项目所提供的资源链接均来源于网络，有能力请支持正版软件，享受完整功能与服务。</p>
     </footer>
+
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-analytics.js";
+        
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkL-m4ZNhiibmjA9pLslDZrasUsmc8mvY",
+            authDomain: "ms2dev-flstudio-count.firebaseapp.com",
+            projectId: "ms2dev-flstudio-count",
+            storageBucket: "ms2dev-flstudio-count.appspot.com",
+            messagingSenderId: "250699042423",
+            appId: "1:250699042423:web:51d5140e2982effeedc072",
+            measurementId: "G-F4VBC1EJ5Y"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        // Function to get and update download count
+        async function updateDownloadCount(id) {
+            const docRef = doc(db, "downloads", id);
+            const docSnap = await getDoc(docRef);
+            
+            if (docSnap.exists()) {
+                const count = docSnap.data().count;
+                document.getElementById(`${id}-count`).textContent = count;
+            } else {
+                // If the document doesn't exist, create it with an initial count of 0
+                await setDoc(docRef, { count: 0 });
+                document.getElementById(`${id}-count`).textContent = 0;
+            }
+
+            // Update the count when a download link is clicked
+            document.querySelector(`[data-id="${id}"]`).addEventListener('click', async () => {
+                await updateDoc(docRef, {
+                    count: increment(1)
+                });
+                const newSnap = await getDoc(docRef);
+                document.getElementById(`${id}-count`).textContent = newSnap.data().count;
+            });
+        }
+
+        // Update download counts for all resources
+        updateDownloadCount("fl-studio-producer");
+        updateDownloadCount("fl-studio-mac");
+        updateDownloadCount("fl-studio-signature");
+    </script>
 </body>
 </html>
