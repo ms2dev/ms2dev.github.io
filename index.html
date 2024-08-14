@@ -76,11 +76,55 @@
             text-align: center;
             padding: 20px;
             background-color: #1a1a1a;
+            position: relative;
         }
         footer p {
             margin: 0;
             font-size: 0.9rem;
             color: #aaa;
+        }
+        .disclaimer-button {
+            background-color: #ff6600;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: inline-block;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        .modal-content {
+            background-color: #333;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
+            color: #fff;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -114,8 +158,21 @@
     </div>
     
     <footer>
-        <p>本项目所提供的资源链接均来源于网络，有能力请支持正版软件，享受完整功能与服务。</p>
+        <button class="disclaimer-button" id="disclaimerBtn">免责声明</button>
     </footer>
+
+    <!-- 模态框 -->
+    <div id="disclaimerModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>免责声明</h2>
+            <p>本网站及其所有内容（包括但不限于文本、图像、链接、下载资源等）仅供教育和学习目的使用。我们不对因使用本网站提供的信息或资源而引发的任何直接或间接的损失或损害负责。</p>
+            <p>版权与内容: 本网站所提供的下载链接、软件及其他资源均来自互联网，仅供个人学习、研究之用。请在下载后24小时内删除，勿将资源用于商业用途。我们不拥有这些资源的版权，如果您认为我们的内容侵犯了您的版权，请联系我们，我们将立即予以删除。</p>
+            <p>第三方链接: 本网站可能包含指向第三方网站的链接。这些链接仅为用户提供方便，并不表示我们对这些网站的内容或使用承担任何责任。访问这些第三方网站是用户自行承担的风险。</p>
+            <p>使用风险: 用户应自行判断和承担使用本网站所提供内容的风险。我们不保证本网站内容的准确性、完整性、可靠性、适用性或可用性，并且不承担因内容不准确或遗漏而产生的责任。</p>
+            <p>变更与更新: 我们保留随时更改、修改或删除本网站内容的权利，且不事先通知。使用本网站的用户应定期访问此页面，以便及时了解最新的免责声明内容。</p>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
@@ -173,6 +230,28 @@
         updateDownloadCount("fl-ape");
         updateDownloadCount("fl-pe");
         updateDownloadCount("fl-sbe");
+
+        // 弹出窗口脚本
+        const modal = document.getElementById("disclaimerModal");
+        const btn = document.getElementById("disclaimerBtn");
+        const span = document.getElementsByClassName("close")[0];
+
+        // 打开模态框
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        // 点击 (x) 关闭模态框
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // 点击模态框外区域关闭模态框
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
     </script>
 </body>
 </html>
