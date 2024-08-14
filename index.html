@@ -94,22 +94,22 @@
         <div class="download-card">
             <h2>FL Studio Producer Edition v21.1.1 [build 3750] 全插件版</h2>
             <p>适用于 Windows</p>
-            <a href="magnet:?xt=urn:btih:B3B69DD393190401EE77EB68C1644FB97B11A7D6" class="download-link" data-id="fl-studio-producer">下载</a>
-            <span class="downloads">下载量: <span id="fl-studio-producer-count">0</span> 次</span>
+            <a href="magnet:?xt=urn:btih:B3B69DD393190401EE77EB68C1644FB97B11A7D6" class="download-link" data-id="f1-ape">下载</a>
+            <span class="downloads">下载量: <span id="f1-ape-count">0</span> 次</span>
         </div>
         
         <div class="download-card">
             <h2>FL Studio v20.8.3 [build 1574] 制作人版</h2>
             <p>适用于 Mac</p>
-            <a href="magnet:?xt=urn:btih:9DFBC445849C11D8C1761615286DE510EE289F48" class="download-link" data-id="fl-studio-mac">下载</a>
-            <span class="downloads">下载量: <span id="fl-studio-mac-count">0</span> 次</span>
+            <a href="magnet:?xt=urn:btih:9DFBC445849C11D8C1761615286DE510EE289F48" class="download-link" data-id="f1-pe">下载</a>
+            <span class="downloads">下载量: <span id="f1-pe-count">0</span> 次</span>
         </div>
         
         <div class="download-card">
             <h2>FL Studio v20.8.3 [Build 2304] Signature Bundle 进阶版</h2>
             <p>适用于 Windows 和 Mac</p>
-            <a href="magnet:?xt=urn:btih:7C922F89C84DF9D65177C91D43F201BF6383B02F" class="download-link" data-id="fl-studio-signature">下载</a>
-            <span class="downloads">下载量: <span id="fl-studio-signature-count">0</span> 次</span>
+            <a href="magnet:?xt=urn:btih:7C922F89C84DF9D65177C91D43F201BF6383B02F" class="download-link" data-id="f1-sbe">下载</a>
+            <span class="downloads">下载量: <span id="f1-sbe-count">0</span> 次</span>
         </div>
     </div>
     
@@ -117,14 +117,10 @@
         <p>本项目所提供的资源链接均来源于网络，有能力请支持正版软件，享受完整功能与服务。</p>
     </footer>
 
-    <!-- Firebase App (the core Firebase SDK) -->
     <script type="module">
-        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-analytics.js";
-        
-        // Your web app's Firebase configuration
+
         const firebaseConfig = {
             apiKey: "AIzaSyBkL-m4ZNhiibmjA9pLslDZrasUsmc8mvY",
             authDomain: "ms2dev-flstudio-count.firebaseapp.com",
@@ -135,39 +131,43 @@
             measurementId: "G-F4VBC1EJ5Y"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
-        // Function to get and update download count
-        async function updateDownloadCount(id) {
-            const docRef = doc(db, "downloads", id);
-            const docSnap = await getDoc(docRef);
-            
-            if (docSnap.exists()) {
-                const count = docSnap.data().count;
-                document.getElementById(`${id}-count`).textContent = count;
-            } else {
-                // If the document doesn't exist, create it with an initial count of 0
-                await setDoc(docRef, { count: 0 });
-                document.getElementById(`${id}-count`).textContent = 0;
-            }
+        async function updateDownloadCount(docId) {
+            const docRef = doc(db, "downloads", docId);
+            try {
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const count = docSnap.data().count;
+                    console.log(`Initial count for ${docId}: ${count}`);
+                    document.getElementById(`${docId}-count`).textContent = count;
+                } else {
+                    await setDoc(docRef, { count: 0 });
+                    document.getElementById(`${docId}-count`).textContent = 0;
+                    console.log(`Document for ${docId} created with initial count 0`);
+                }
 
-            // Update the count when a download link is clicked
-            document.querySelector(`[data-id="${id}"]`).addEventListener('click', async () => {
-                await updateDoc(docRef, {
-                    count: increment(1)
+                document.querySelector(`[data-id="${docId}"]`).addEventListener('click', async () => {
+                    try {
+                        await updateDoc(docRef, {
+                            count: increment(1)
+                        });
+                        const newSnap = await getDoc(docRef);
+                        document.getElementById(`${docId}-count`).textContent = newSnap.data().count;
+                        console.log(`Updated count for ${docId}: ${newSnap.data().count}`);
+                    } catch (error) {
+                        console.error("Error updating document: ", error);
+                    }
                 });
-                const newSnap = await getDoc(docRef);
-                document.getElementById(`${id}-count`).textContent = newSnap.data().count;
-            });
+            } catch (error) {
+                console.error("Error getting document: ", error);
+            }
         }
 
-        // Update download counts for all resources
-        updateDownloadCount("fl-studio-producer-count");
-        updateDownloadCount("fl-studio-mac-count");
-        updateDownloadCount("fl-studio-signature-count");
+        updateDownloadCount("f1-ape");
+        updateDownloadCount("f1-pe");
+        updateDownloadCount("f1-sbe");
     </script>
 </body>
 </html>
