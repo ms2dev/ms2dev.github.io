@@ -136,22 +136,26 @@
 
         async function updateDownloadCount(docId) {
             const docRef = doc(db, "downloads", docId);
+
             try {
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     const count = docSnap.data().count;
                     console.log(`Initial count for ${docId}: ${count}`);
+                    // 根据文档ID更新页面上的下载量
                     document.getElementById(`${docId}-count`).textContent = count;
                 } else {
                     console.error(`Document ${docId} does not exist`);
                 }
 
+                // 监听下载链接的点击事件
                 document.querySelector(`[data-id="${docId}"]`).addEventListener('click', async () => {
                     try {
                         await updateDoc(docRef, {
                             count: increment(1)
                         });
                         const newSnap = await getDoc(docRef);
+                        // 更新点击后的下载量
                         document.getElementById(`${docId}-count`).textContent = newSnap.data().count;
                         console.log(`Updated count for ${docId}: ${newSnap.data().count}`);
                     } catch (error) {
@@ -163,6 +167,7 @@
             }
         }
 
+        // 调用函数以获取并更新下载量
         updateDownloadCount("fl-ape");
         updateDownloadCount("fl-pe");
         updateDownloadCount("fl-sbe");
